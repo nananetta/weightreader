@@ -1,0 +1,6 @@
+run this command to install 
+
+****
+RXTX
+****
+mvn install:install-file -Dfile=extra-resources/dependencies/rxtx/RXTXcomm.jar -Dpackaging=jar -DgroupId=com.oracle -DartifactId=ojdbc6 -Dversion=11.2.0
