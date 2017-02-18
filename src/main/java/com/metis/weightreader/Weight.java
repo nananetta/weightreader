@@ -3,10 +3,16 @@ package com.metis.weightreader;
 import java.util.Date;
 
 public class Weight {
-
+	
     private final Double weight;
     private final Unit unit;
     private final Date measureDate;
+    
+    public Weight(Double weight) {
+    	this.weight = weight;
+    	this.unit = Unit.KG;
+    	this.measureDate = new Date();
+    }
     
     public Weight(Double weight, Unit unit) {
     	this.weight = weight;
@@ -17,6 +23,11 @@ public class Weight {
 	public Double getWeight() {
 		return weight;
 	}
+	
+	public String getWeightString() {
+		return String.format("%05d", weight.intValue());
+	}
+	
 	public Unit getUnit() {
 		return unit;
 	}
