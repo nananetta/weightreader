@@ -9,6 +9,13 @@ public class WeightReaderRunner implements Runnable {
 
 	private WeightController listener;
 	private volatile boolean running = true;
+	private static int weightReadInterval;
+	private static boolean isMockWeightReader;
+
+	static {
+		weightReadInterval = ConfigProperties.getWeightReadInterval();
+		isMockWeightReader = ConfigProperties.isMockWeightReader();
+	}
 
 	public WeightReaderRunner(WeightController listener) {
 		LOGGER.info("Start WeightReader Thread");
@@ -18,18 +25,25 @@ public class WeightReaderRunner implements Runnable {
 	@Override
 	public void run() {
 		try {
-//			SerialReader.init();
-			while (running) {
-				Thread.sleep(1000);
-//				Weight weight = SerialReader.read();
-//				listener.update(weight);
-				listener.update(mockWeightRead());
+			if (!isMockWeightReader) {
+				SerialReader.init();
 			}
-			System.out.println("stopped");
+			while (running) {
+				if (!isMockWeightReader) {
+					Weight weight = SerialReader.read();
+					listener.update(weight);
+				} else {
+					listener.update(mockWeightRead());
+				}
+				Thread.sleep(weightReadInterval);
+			}
+			LOGGER.info("stopped");
 		} catch (InterruptedException e) {
-			LOGGER.info(e.getMessage(), e);
+			LOGGER.error(e.getMessage(), e);
 		} finally {
-//			SerialReader.close();
+			if (!isMockWeightReader) {
+				SerialReader.close();
+			}
 		}
 	}
 
@@ -37,7 +51,7 @@ public class WeightReaderRunner implements Runnable {
 		int rand = (int) (Math.random() * 100);
 		return new Weight((double) rand);
 	}
-	
+
 	public void stop() {
 		this.running = false;
 		LOGGER.info("Runner Stopped");

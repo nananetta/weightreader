@@ -17,7 +17,7 @@ public class SerialReader {
 
 	public static Weight readWeight() throws Exception {
 		Weight weight = null;
-		CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(SerialPortProperties.getPortName());
+		CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(ConfigProperties.getPortName());
 		if (portIdentifier.isCurrentlyOwned()) {
 			System.out.println("Error: Port is currently in use");
 			LOGGER.error("Error: Port is currently in use");
@@ -25,8 +25,8 @@ public class SerialReader {
 			CommPort commPort = portIdentifier.open(SerialReader.class.getName(), 2000);
 			if (commPort instanceof SerialPort) {
 				SerialPort serialPort = (SerialPort) commPort;
-				serialPort.setSerialPortParams(SerialPortProperties.getBaudRate(), SerialPortProperties.getDataBits(),
-						SerialPortProperties.getStopBits(), SerialPortProperties.getParity());
+				serialPort.setSerialPortParams(ConfigProperties.getBaudRate(), ConfigProperties.getDataBits(),
+						ConfigProperties.getStopBits(), ConfigProperties.getParity());
 
 				InputStream in = serialPort.getInputStream();
 				String value = readValue(in);
@@ -43,7 +43,7 @@ public class SerialReader {
 	public static void init() {
 		try {
 			CommPortIdentifier portIdentifier = CommPortIdentifier
-					.getPortIdentifier(SerialPortProperties.getPortName());
+					.getPortIdentifier(ConfigProperties.getPortName());
 			if (portIdentifier.isCurrentlyOwned()) {
 				System.out.println("Error: Port is currently in use");
 				LOGGER.error("Error: Port is currently in use");
@@ -51,9 +51,9 @@ public class SerialReader {
 				CommPort commPort = portIdentifier.open(SerialReader.class.getName(), 2000);
 				if (commPort instanceof SerialPort) {
 					serialPort = (SerialPort) commPort;
-					serialPort.setSerialPortParams(SerialPortProperties.getBaudRate(),
-							SerialPortProperties.getDataBits(), SerialPortProperties.getStopBits(),
-							SerialPortProperties.getParity());
+					serialPort.setSerialPortParams(ConfigProperties.getBaudRate(),
+							ConfigProperties.getDataBits(), ConfigProperties.getStopBits(),
+							ConfigProperties.getParity());
 				} else {
 					System.out.println("Error: Only serial ports are handled by this example.");
 					LOGGER.error("Error: Only serial ports are handled by this example.");

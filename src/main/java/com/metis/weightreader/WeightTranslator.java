@@ -7,7 +7,7 @@ public class WeightTranslator {
 
 	public static Weight translate(String rawValue) {
 		Double value = 0.0;
-		Pattern p = Pattern.compile(SerialPortProperties.getRawValueParserRegex());
+		Pattern p = Pattern.compile(ConfigProperties.getRawValueParserRegex());
 	    Matcher m = p.matcher(rawValue);
 	    m.find();
 	    String actualValue = m.group();

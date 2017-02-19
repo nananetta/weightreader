@@ -34,7 +34,7 @@ public class WeightController {
 
 	@RequestMapping("/disconnect")
 	public void disconnect() {
-		System.out.println("Disconnect to SerialReader");
+		LOGGER.info("Disconnect to SerialReader");
 		runner.stop();
 		SerialReader.close();
 	}
