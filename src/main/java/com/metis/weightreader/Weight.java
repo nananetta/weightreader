@@ -7,6 +7,7 @@ public class Weight {
     private final Double weight;
     private final Unit unit;
     private final Date measureDate;
+    private boolean zeroIndicator = false;
     
     public Weight(Double weight) {
     	this.weight = weight;
@@ -33,6 +34,14 @@ public class Weight {
 	}
 	public Date getMeasureDate() {
 		return measureDate;
+	}
+
+	public boolean isZeroIndicator() {
+		return zeroIndicator;
+	}
+
+	public void setZeroIndicator(boolean zeroIndicator) {
+		this.zeroIndicator = zeroIndicator;
 	}
 
 	enum Unit { 

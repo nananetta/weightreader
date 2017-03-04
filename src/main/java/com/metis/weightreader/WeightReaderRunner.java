@@ -29,12 +29,17 @@ public class WeightReaderRunner implements Runnable {
 				SerialReader.init();
 			}
 			while (running) {
+				Weight weight = null;
 				if (!isMockWeightReader) {
-					Weight weight = SerialReader.read();
-					listener.update(weight);
+					weight = SerialReader.read();
 				} else {
-					listener.update(mockWeightRead());
+					weight = mockWeightRead();
 				}
+				listener.update(weight);
+				
+				// Check if weight is zero for a number of times, then mark zeroIndicator flag.
+				checkZeroIndicator(weight);
+				
 				Thread.sleep(weightReadInterval);
 			}
 			LOGGER.info("stopped");
@@ -47,6 +52,19 @@ public class WeightReaderRunner implements Runnable {
 		}
 	}
 
+	private void checkZeroIndicator(Weight weight) {
+		int zeroCounter = 0;
+		if (weight.getWeight() == 0) {
+			zeroCounter++;
+		} else {
+			zeroCounter = 0;
+			weight.setZeroIndicator(false);
+		}
+		if (zeroCounter == 3) {
+			weight.setZeroIndicator(true);
+		}
+	}
+	
 	private Weight mockWeightRead() {
 		int rand = (int) (Math.random() * 100);
 		return new Weight((double) rand);
