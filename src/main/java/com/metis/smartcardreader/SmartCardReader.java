@@ -5,34 +5,49 @@ import java.util.List;
 import javax.smartcardio.ATR;
 import javax.smartcardio.Card;
 import javax.smartcardio.CardChannel;
+import javax.smartcardio.CardException;
+import javax.smartcardio.CardNotPresentException;
 import javax.smartcardio.CardTerminal;
 import javax.smartcardio.CommandAPDU;
 import javax.smartcardio.ResponseAPDU;
 import javax.smartcardio.TerminalFactory;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class SmartCardReader {
 
+	private static final Logger LOGGER = LogManager.getLogger(SmartCardReader.class);
+	private static CardTerminal terminal;
+	
 	public static void main(String[] args) {
-		SmartCardReader cc = new SmartCardReader();
-		cc.read();
+		init();
+		read();
 	}
-
-	public void read() {
+	
+	public static void init() {
 		try {
 			// show the list of available terminals
 			TerminalFactory factory = TerminalFactory.getDefault();
-			List<CardTerminal> terminals = factory.terminals().list();
+			List<CardTerminal> terminals;
+			terminals = factory.terminals().list();
 			System.out.println("Terminals: " + terminals);
-
+	
 			// get the first terminal
-			CardTerminal terminal = terminals.get(0);
-			
-			ReaderThread rt = new ReaderThread(terminal);
-			rt.run();
+			terminal = terminals.get(0);
+		} catch (CardException e) {
+			LOGGER.error(e.getMessage(), e);
+		}
+	}
+
+	public static SmartCard read() {
+		
+		Card card = null;
+		try {
 			// establish a connection with the card
-//			Card card = terminal.connect("*");
-//			System.out.println("card: " + card);
-//			
+			card = terminal.connect("*");
+			System.out.println("card: " + card);
+		
 //			// get the ATR
 //			ATR atr = card.getATR();
 //			byte[] baAtr = atr.getBytes();
@@ -40,26 +55,35 @@ public class SmartCardReader {
 //			for (int i = 0; i < baAtr.length; i++) {
 //				System.out.printf("%02X ", baAtr[i]);
 //			}
-//
-//			System.out.println();
-//			CardChannel channel = card.getBasicChannel();
-//			byte[] cmdApduGetCardUid = new byte[] { (byte) 0xFF, (byte) 0xCA, (byte) 0x00, (byte) 0x00, (byte) 0x00 };
-//			ResponseAPDU respApdu = channel.transmit(new CommandAPDU(cmdApduGetCardUid));
-//
-//			if (respApdu.getSW1() == 0x90 && respApdu.getSW2() == 0x00) {
-//
-//				byte[] baCardUid = respApdu.getData();
-//
-//				System.out.print("Card UID = 0x");
-//				for (int i = 0; i < baCardUid.length; i++) {
-//					System.out.printf("%02X ", baCardUid[i]);
-//				}
-//			}
+
+			CardChannel channel = card.getBasicChannel();
+			byte[] cmdApduGetCardUid = new byte[] { (byte) 0xFF, (byte) 0xCA, (byte) 0x00, (byte) 0x00, (byte) 0x00 };
+			ResponseAPDU respApdu = channel.transmit(new CommandAPDU(cmdApduGetCardUid));
+
+			if (respApdu.getSW1() == 0x90 && respApdu.getSW2() == 0x00) {
+
+				byte[] baCardUid = respApdu.getData();
+
+				LOGGER.info("Card UID = 0x ");
+				StringBuffer sb = new StringBuffer();
+				for (int i = 0; i < baCardUid.length; i++) {
+					sb.append(String.format("%02X ", baCardUid[i]));
+				}
+				String cardUid = sb.toString();
+				LOGGER.info(cardUid);
+				return new SmartCard(cardUid);
+			}
+				
 			// disconnect
 //			card.disconnect(false);
 //			rt.wait();
-		} catch (Exception e) {
-			e.printStackTrace();
+			return null;
+		} catch (CardNotPresentException e) {
+			LOGGER.error(e.getMessage(), e);
+			return null;
+		} catch (CardException e) {
+			LOGGER.error(e.getMessage(), e);
+			return null;
 		}
 	}
 

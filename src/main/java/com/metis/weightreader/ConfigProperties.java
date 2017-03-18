@@ -68,4 +68,12 @@ public class ConfigProperties {
 		return Boolean.valueOf(p.getProperty("weightread.mock"));
 	}
 
+	public static int getCardReadInterval() {
+		return Integer.parseInt(p.getProperty("cardread.interval"));
+	}
+	
+	public static boolean isMockCardReader() {
+		return Boolean.valueOf(p.getProperty("cardread.mock"));
+	}
+
 }

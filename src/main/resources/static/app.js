@@ -13,6 +13,10 @@ function connect() {
 //        console.log('Connected: ' + frame);
         stompClient.subscribe('/topic/weight', function (resp) {
         	updateWeight(JSON.parse(resp.body).weightString);
+        	setZeroIndicator(JSON.parse(resp.body).zeroIndicator);
+        });
+        stompClient.subscribe('/topic/driverRecord', function (resp) {
+        	updateDriverRecord(JSON.parse(resp.body));
         });
         stompClient.send("/app/read", {}, null);
     });
@@ -23,11 +27,30 @@ function updateWeight(message) {
     odometer.innerHTML = message;
 }
 
+function updateDriverRecord(messageObject) {
+//	console.log(message);
+    driverRecord.innerHTML = "สวัสดีค่ะ ผู้ถือบัตร "+messageObject;
+}
+
+function setZeroIndicator(message) {
+    if(strcmp("true", message) == 0) {
+    	$(".zeroIndicator").css("background-color", "#33fa35" );
+    } else {
+    	$(".zeroIndicator").css("background-color", "#ff6666" );
+    }
+}
+
 function setDisconnect() {
     $.ajax({
         url : '/disconnect',
         type: 'GET'
     });
+}
+
+function strcmp(a, b) {
+    if (a.toString() < b.toString()) return -1;
+    if (a.toString() > b.toString()) return 1;
+    return 0;
 }
 
 function disconnect() {

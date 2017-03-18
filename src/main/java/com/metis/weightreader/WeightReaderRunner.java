@@ -11,6 +11,7 @@ public class WeightReaderRunner implements Runnable {
 	private volatile boolean running = true;
 	private static int weightReadInterval;
 	private static boolean isMockWeightReader;
+	private int zeroCounter = 0;
 
 	static {
 		weightReadInterval = ConfigProperties.getWeightReadInterval();
@@ -35,11 +36,10 @@ public class WeightReaderRunner implements Runnable {
 				} else {
 					weight = mockWeightRead();
 				}
-				listener.update(weight);
-				
+				LOGGER.info("weight: " + weight.getWeightString());
 				// Check if weight is zero for a number of times, then mark zeroIndicator flag.
 				checkZeroIndicator(weight);
-				
+				listener.updateWeight(weight);
 				Thread.sleep(weightReadInterval);
 			}
 			LOGGER.info("stopped");
@@ -53,25 +53,33 @@ public class WeightReaderRunner implements Runnable {
 	}
 
 	private void checkZeroIndicator(Weight weight) {
-		int zeroCounter = 0;
-		if (weight.getWeight() == 0) {
-			zeroCounter++;
-		} else {
-			zeroCounter = 0;
+		if(listener.isResetWeight()) {
 			weight.setZeroIndicator(false);
+			zeroCounter = 0;
+			listener.setResetWeight(false);
+			return;
 		}
-		if (zeroCounter == 3) {
+		if (weight.getWeight() == 0) {
+//			System.out.println("weight.getWeight(): "+weight.getWeight());
+			zeroCounter++;
+//		} else {
+//			zeroCounter = 0;
+//			weight.setZeroIndicator(false);
+		}
+//		System.out.println("zeroCounter: "+zeroCounter);
+		if (zeroCounter >= 1) {
 			weight.setZeroIndicator(true);
 		}
 	}
 	
 	private Weight mockWeightRead() {
-		int rand = (int) (Math.random() * 100);
+		int rand = (int) (Math.random() * 10);
 		return new Weight((double) rand);
 	}
 
 	public void stop() {
 		this.running = false;
+		this.zeroCounter = 0;
 		LOGGER.info("Runner Stopped");
 	}
 
