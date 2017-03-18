@@ -29,12 +29,13 @@ function updateWeight(message) {
 
 function updateDriverRecord(messageObject) {
 //	console.log(message);
-    driverRecord.innerHTML = "สวัสดีค่ะ ผู้ถือบัตร "+messageObject;
+    driverRecord.innerHTML = "สวัสดีค่ะ ผู้ถือบัตร "+messageObject.identifier;
 }
 
 function setZeroIndicator(message) {
     if(strcmp("true", message) == 0) {
     	$(".zeroIndicator").css("background-color", "#33fa35" );
+    	driverRecord.innerHTML = "-";
     } else {
     	$(".zeroIndicator").css("background-color", "#ff6666" );
     }

@@ -68,7 +68,7 @@ public class WeightController {
 	}
 
 	private boolean isValidCurrWeight() {
-		return (currWeight != null && currWeight.isZeroIndicator());
+		return (currWeight != null && currWeight.isZeroIndicator() && currWeight.getWeight() > 0);
 	}
 
 	private boolean isValidCurrCard() {

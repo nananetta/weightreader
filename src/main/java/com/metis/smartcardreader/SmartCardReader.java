@@ -46,7 +46,6 @@ public class SmartCardReader {
 		try {
 			// establish a connection with the card
 			card = terminal.connect("*");
-			System.out.println("card: " + card);
 		
 //			// get the ATR
 //			ATR atr = card.getATR();
@@ -67,23 +66,27 @@ public class SmartCardReader {
 				LOGGER.info("Card UID = 0x ");
 				StringBuffer sb = new StringBuffer();
 				for (int i = 0; i < baCardUid.length; i++) {
-					sb.append(String.format("%02X ", baCardUid[i]));
+					sb.append(String.format("%02X", baCardUid[i]));
 				}
 				String cardUid = sb.toString();
 				LOGGER.info(cardUid);
+				System.out.println(cardUid);
 				return new SmartCard(cardUid);
 			}
-				
-			// disconnect
-//			card.disconnect(false);
-//			rt.wait();
 			return null;
 		} catch (CardNotPresentException e) {
-			LOGGER.error(e.getMessage(), e);
 			return null;
 		} catch (CardException e) {
-			LOGGER.error(e.getMessage(), e);
 			return null;
+		} finally {
+			// disconnect
+			if(card != null) {
+				try {
+					card.disconnect(false);
+				} catch (CardException e) {
+					// do nothing
+				}
+			}
 		}
 	}
 
