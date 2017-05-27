@@ -39,7 +39,9 @@ public class SmartCardReaderRunner implements Runnable {
 	@Override
 	public void run() {
 		try {
-			SmartCardReader.init();
+			if (!isMockCardReader) {
+				SmartCardReader.init();
+			}
 			while (running) {
 				SmartCard card = null;
 				if (!isMockCardReader) {
